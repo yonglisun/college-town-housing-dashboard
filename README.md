@@ -39,6 +39,7 @@ The five original dataset files in `data/college_town_home_sales.*` remain uncha
 | `app.js` | Loads summary data and manages filters, metrics, and charts |
 | `scripts/build_dashboard_data.py` | Rebuilds dashboard metrics from the source CSV |
 | `data/city_market_summary.json` | Generated city-level and overall dashboard metrics |
+| `data/city_market_summary.js` | Generated browser fallback for direct-file preview environments |
 | `data/college_town_home_sales.csv` | Original source data |
 | `docs/data_description_sheet.md` | Source field definitions and data-quality guidance |
 | `.github/workflows/pages.yml` | Publishes the repository root to GitHub Pages |
@@ -71,6 +72,8 @@ The generated JSON should report 35,442 records, 18 cities, and 11 universities.
 | Median distance to campus | 3.4 miles |
 
 These values are independently checked against the supplied SQLite copy of the dataset during development.
+
+The page normally loads the generated JavaScript data asset, which also works in preview tools that open `index.html` directly. The application retains a relative-path JSON request as a fallback. Both generated files contain the same metrics and are written by the same build script.
 
 ## Citation
 

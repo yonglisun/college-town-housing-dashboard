@@ -140,9 +140,12 @@ function populateSelect() {
 
 async function initializeDashboard() {
   try {
-    const response = await fetch("data/city_market_summary.json");
-    if (!response.ok) throw new Error(`Data request failed with status ${response.status}`);
-    dashboardData = await response.json();
+    dashboardData = window.COLLEGE_TOWN_HOUSING_DATA;
+    if (!dashboardData) {
+      const response = await fetch("data/city_market_summary.json");
+      if (!response.ok) throw new Error(`Data request failed with status ${response.status}`);
+      dashboardData = await response.json();
+    }
     populateSelect();
     renderMetrics();
     renderCharts();

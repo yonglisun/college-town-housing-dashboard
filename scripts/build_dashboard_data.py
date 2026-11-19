@@ -14,6 +14,7 @@ from statistics import median
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_PATH = ROOT / "data" / "college_town_home_sales.csv"
 OUTPUT_PATH = ROOT / "data" / "city_market_summary.json"
+SCRIPT_OUTPUT_PATH = ROOT / "data" / "city_market_summary.js"
 MINIMUM_VALID_PRICE = 1_000
 
 
@@ -106,12 +107,17 @@ def build_dashboard_data() -> dict[str, object]:
 
 def main() -> None:
     dashboard_data = build_dashboard_data()
-    OUTPUT_PATH.write_text(
-        json.dumps(dashboard_data, indent=2, ensure_ascii=False) + "\n",
+    serialized_data = json.dumps(dashboard_data, indent=2, ensure_ascii=False)
+    OUTPUT_PATH.write_text(serialized_data + "\n", encoding="utf-8")
+    SCRIPT_OUTPUT_PATH.write_text(
+        "window.COLLEGE_TOWN_HOUSING_DATA = " + serialized_data + ";\n",
         encoding="utf-8",
     )
+    OUTPUT_PATH.chmod(0o644)
+    SCRIPT_OUTPUT_PATH.chmod(0o644)
     print(
-        f"Wrote {OUTPUT_PATH.relative_to(ROOT)} with "
+        f"Wrote {OUTPUT_PATH.relative_to(ROOT)} and "
+        f"{SCRIPT_OUTPUT_PATH.relative_to(ROOT)} with "
         f"{len(dashboard_data['cities'])} city summaries."
     )
 
