@@ -1,31 +1,191 @@
 <!DOCTYPE html>
-<!-- A placeholder from the Home Sales template. Replace this file with your site's first page. -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Under construction</title>
-  <!-- An empty icon, so the browser doesn't log an error looking for favicon.ico -->
+  <meta name="description" content="Compare home sale prices, market activity, and time on market across 18 U.S. college towns.">
+  <title>College Town Housing Market Dashboard</title>
   <link rel="icon" href="data:,">
-  <style>
-    :root { color-scheme: light dark; }
-    body {
-      max-width: 40rem;
-      margin: 0 auto;
-      padding: 3rem 1rem;
-      font-family: system-ui, sans-serif;
-      line-height: 1.5;
-    }
-    footer { margin-top: 3rem; font-size: 0.875rem; opacity: 0.75; }
-  </style>
+  <link rel="stylesheet" href="styles.css">
+  <script src="data/city_market_summary.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
 <body>
-  <main>
-    <h1>This site is under construction</h1>
-    <p>It will show findings from the College-town home sales dataset.</p>
+  <a class="skip-link" href="#dashboard">Skip to dashboard</a>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="College Town Housing home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" role="img">
+          <path d="M4 15.5 16 6l12 9.5v11a1.5 1.5 0 0 1-1.5 1.5h-21A1.5 1.5 0 0 1 4 26.5v-11Z"/>
+          <path d="M11 28V18h10v10M9 11V6h5v1"/>
+        </svg>
+      </span>
+      <span>College Town Housing</span>
+    </a>
+    <a class="header-link" href="#methodology">Methodology</a>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-content">
+        <p class="eyebrow">Housing market explorer</p>
+        <h1 id="page-title">A clearer view of college town housing.</h1>
+        <p class="hero-copy">Compare prices and market activity across 18 U.S. college towns near 11 university campuses.</p>
+        <div class="dataset-meta" aria-label="Dataset summary">
+          <span><strong>35,442</strong> completed sales</span>
+          <span><strong>2023–2026</strong> sale records</span>
+        </div>
+      </div>
+
+      <div class="hero-accent" aria-hidden="true">
+        <div class="accent-card accent-card-main">
+          <span>18 markets</span>
+          <svg viewBox="0 0 240 88">
+            <path d="M4 70C32 67 44 49 70 53s35 11 57-5 37-29 58-22 25 19 51-17"/>
+            <circle cx="127" cy="48" r="5"/>
+            <circle cx="236" cy="9" r="5"/>
+          </svg>
+        </div>
+        <div class="accent-card accent-card-small"><span>11</span> campuses</div>
+      </div>
+    </section>
+
+    <section class="dashboard" id="dashboard" aria-labelledby="dashboard-title">
+      <div class="dashboard-toolbar">
+        <div>
+          <p class="section-label">Market overview</p>
+          <h2 id="dashboard-title">Explore the data</h2>
+        </div>
+        <div class="select-field">
+          <label for="city-select">Select a market</label>
+          <div class="select-wrap">
+            <select id="city-select" disabled>
+              <option>Loading markets…</option>
+            </select>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="selection-summary" aria-live="polite">
+        <div>
+          <p class="selection-kicker">Currently viewing</p>
+          <h3 id="selection-title">All Cities</h3>
+        </div>
+        <p id="selection-description">Loading market data…</p>
+      </div>
+
+      <div class="metric-grid" id="metric-grid" aria-label="Key market statistics">
+        <article class="metric-card metric-price">
+          <div class="metric-icon" aria-hidden="true">$</div>
+          <p>Median sale price</p>
+          <strong id="median-price">—</strong>
+          <span id="price-note">Sales of $1,000 or more</span>
+        </article>
+        <article class="metric-card metric-sales">
+          <div class="metric-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20H4v-9.5ZM9 20v-6h6v6"/></svg>
+          </div>
+          <p>Number of sales</p>
+          <strong id="number-sales">—</strong>
+          <span>Completed sale records</span>
+        </article>
+        <article class="metric-card metric-days">
+          <div class="metric-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M6 3v3m12-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/></svg>
+          </div>
+          <p>Median days on market</p>
+          <strong id="median-days">—</strong>
+          <span id="days-note">Listing to contract</span>
+        </article>
+        <article class="metric-card metric-distance">
+          <div class="metric-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s6-5.3 6-11a6 6 0 1 0-12 0c0 5.7 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg>
+          </div>
+          <p>Median distance to campus</p>
+          <strong id="median-distance">—</strong>
+          <span>Straight-line distance</span>
+        </article>
+      </div>
+
+      <div class="chart-grid">
+        <article class="chart-card" aria-labelledby="price-chart-title">
+          <div class="chart-heading">
+            <div>
+              <p class="section-label">Price comparison</p>
+              <h3 id="price-chart-title">Median sale price by city</h3>
+            </div>
+            <span class="chart-unit">USD</span>
+          </div>
+          <p class="chart-instruction">Select any bar to focus on that market.</p>
+          <div class="bar-chart" id="price-chart" aria-label="Median sale price by city"></div>
+        </article>
+
+        <article class="chart-card" aria-labelledby="sales-chart-title">
+          <div class="chart-heading">
+            <div>
+              <p class="section-label">Market activity</p>
+              <h3 id="sales-chart-title">Number of sales by city</h3>
+            </div>
+            <span class="chart-unit">SALES</span>
+          </div>
+          <p class="chart-instruction">Counts include every completed sale record.</p>
+          <div class="bar-chart" id="sales-chart" aria-label="Number of sales by city"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="methodology" id="methodology" aria-labelledby="methodology-title">
+      <div class="methodology-intro">
+        <p class="section-label">Read the numbers with confidence</p>
+        <h2 id="methodology-title">How the dashboard calculates each metric</h2>
+        <p>Every figure is computed from the supplied College-town home sales dataset. Missing values remain missing and are never replaced with zero.</p>
+      </div>
+      <div class="rule-list">
+        <article class="rule">
+          <span>01</span>
+          <div>
+            <h3>Price</h3>
+            <p>Median sale price includes records with a sale price of at least $1,000. Four lower-price records are excluded from this metric.</p>
+          </div>
+        </article>
+        <article class="rule">
+          <span>02</span>
+          <div>
+            <h3>Sales</h3>
+            <p>Each unique <code>listing_id</code> counts as one completed sale. Repeated street addresses are retained because they may represent separate units.</p>
+          </div>
+        </article>
+        <article class="rule">
+          <span>03</span>
+          <div>
+            <h3>Days on market</h3>
+            <p>Days on market is the time from <code>list_date</code> to <code>contract_date</code>. Only records containing both dates are included.</p>
+          </div>
+        </article>
+        <article class="rule">
+          <span>04</span>
+          <div>
+            <h3>Distance</h3>
+            <p>Campus distance is measured in straight-line miles to the nearest assigned university landmark. The dashboard reports the median.</p>
+          </div>
+        </article>
+      </div>
+      <div class="data-caveat">
+        <strong>Data context</strong>
+        <p>Sale records span March 2023 through March 2026, so 2023 and 2026 are partial years. Property types are not used because the source classifications are unreliable.</p>
+      </div>
+    </section>
   </main>
+
   <footer>
-    <p>Data: College-town home sales dataset, version 1.0 (2026). University of Illinois-Deloitte Foundation Center for Business Emerging Technologies. Data collected March 2026.</p>
+    <p>College-town home sales dataset, version 1.0 (2026).</p>
+    <p>University of Illinois–Deloitte Foundation Center for Business Emerging Technologies.</p>
   </footer>
+
+  <div class="error-banner" id="error-banner" role="alert" hidden>
+    Market data could not be loaded. Please refresh the page.
+  </div>
 </body>
 </html>

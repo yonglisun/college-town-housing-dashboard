@@ -1,51 +1,80 @@
-# [Your site's title]
+# College Town Housing Market Dashboard
 
-## Start here (delete this section before you submit)
-
-This repository is your starting point for the Home Sales case. It already holds the dataset, its description sheet, project instructions for your AI coding agent, and outlines of the README and agent log that the case asks for.
-
-1. **Turn on GitHub Pages.** In this repository, open **Settings**, then **Pages**. Under "Build and deployment," set **Source** to **GitHub Actions**. GitHub may suggest workflows to add. Skip them: this repository already has one, `.github/workflows/pages.yml`.
-2. **Publish for the first time.** Open the **Actions** tab, choose **Publish site to GitHub Pages** in the sidebar, click **Run workflow**, then click **Run workflow** again to confirm. If the tab already shows a failed run from when you created the repository, that's expected: Pages wasn't turned on yet. When the new run shows a green check, your site is at `https://your-username.github.io/your-repo-name/`. It shows a placeholder page until you replace `index.html`.
-
-    From then on, every push to the main branch publishes the site within a few minutes. If the live site doesn't show a change, open the **Actions** tab. A red X means the publish failed, and the run's log says why.
-3. **Open the repository in your AI coding agent.** Its project instructions are in `AGENTS.md`. If your agent reads its instructions from a file with a different name, check its documentation and copy `AGENTS.md` to that name. Add to the instructions as you learn what your agent needs.
-4. **Read `docs/data_description_sheet.md`** before you ask the agent for any analysis.
-5. **Build in small steps,** as the setup guide describes. Add an entry to `AGENT_LOG.md` each time you work with the agent.
-6. **Fill in every section below** before you submit.
-
-| Path | What it is |
-|---|---|
-| `index.html` | A placeholder page. Replace it with your site. |
-| `data/college_town_home_sales.csv` | The dataset, version 1.0: 35,442 rows. Your site reads this file. |
-| `data/college_town_home_sales.xlsx`, `.sqlite`, `.duckdb`, `.parquet` | The same data in Excel, SQLite, DuckDB and Parquet formats, with identical values |
-| `docs/data_description_sheet.md` | What every column means, and five problems in the data |
-| `AGENTS.md` | Project instructions for your AI coding agent |
-| `AGENT_LOG.md` | Your agent log |
-| `scripts/` | Scripts that make smaller data files for the site |
-| `.github/workflows/pages.yml` | Publishes the site to GitHub Pages each time you push to main. It publishes your files as they are. If you switch to a framework that needs a build step, have your agent update it. |
-
-Don't edit any of the five dataset files. Your site needs only the CSV file. The other formats make it easier to check numbers a second way, for example with a pivot table in Excel or a SQL query on the SQLite file. In SQLite and DuckDB, the table is named `home_sales`.
-
-## What this site is for
-
-_Replace this line with your site's question and audience, or a short description of the site._
+An interactive data website for comparing home prices and market activity across 18 U.S. college towns near 11 university campuses.
 
 ## Live site
 
-https://your-username.github.io/your-repo-name/
+https://yonglisun.github.io/college-town-housing-dashboard/
 
-## Data notes
+## Dashboard features
 
-_Replace this line. Say which rows you left out and why, and how each figure on the site is defined. "Five things that will bite you" in the description sheet lists the problems to cover._
+- Median sale price, number of sales, median days on market, and median distance to campus
+- City selector covering all 18 markets
+- Interactive price and sales comparison charts
+- City-level context and data-availability notes
+- Responsive layouts for desktop and mobile screens
+- Keyboard-accessible chart controls and clear focus states
 
-## Tools we used
+The site uses plain HTML, CSS, and JavaScript. It has no build step or third-party runtime dependencies, so GitHub Pages can publish the repository root directly.
 
-_Replace this line with your AI coding agent or agents, and any libraries and other tools you used._
+## Data and calculation rules
+
+The dashboard uses the College-town home sales dataset, version 1.0 (2026), collected in March 2026. The source contains 35,442 completed sale records.
+
+- **Median sale price:** Uses records where `sale_price >= 1000`. Four lower-price records are excluded. High-price outliers are retained because the median is resistant to extreme values.
+- **Number of sales:** Counts unique `listing_id` values. Records are not deduplicated by street address because separate units can share an address.
+- **Median days on market:** Calculates `contract_date - list_date` only when both dates are present. Missing dates remain missing and are not treated as zero.
+- **Median distance to campus:** Uses `miles_to_campus`, a straight-line distance to the nearest assigned university landmark.
+- **Time range:** Sale records run from March 27, 2023 through March 25, 2026. The first and last years are partial years.
+- **Property type:** `home_type` is not used in the dashboard because its classifications are unreliable.
+
+The five original dataset files in `data/college_town_home_sales.*` remain unchanged.
+
+## Project files
+
+| Path | Purpose |
+|---|---|
+| `index.html` | Dashboard structure and content |
+| `styles.css` | Responsive layout, visual design, and accessibility states |
+| `app.js` | Loads summary data and manages filters, metrics, and charts |
+| `scripts/build_dashboard_data.py` | Rebuilds dashboard metrics from the source CSV |
+| `data/city_market_summary.json` | Generated city-level and overall dashboard metrics |
+| `data/city_market_summary.js` | Generated browser fallback for direct-file preview environments |
+| `data/college_town_home_sales.csv` | Original source data |
+| `docs/data_description_sheet.md` | Source field definitions and data-quality guidance |
+| `.github/workflows/pages.yml` | Publishes the repository root to GitHub Pages |
+
+## Run locally
+
+From the repository root, rebuild the summary data when the source data changes:
+
+```bash
+python3 scripts/build_dashboard_data.py
+```
+
+Start a local web server:
+
+```bash
+python3 -m http.server 4173
+```
+
+Then open `http://localhost:4173` in a browser. A local server is required because the page loads its JSON data with `fetch()`.
+
+## Verification
+
+The generated JSON should report 35,442 records, 18 cities, and 11 universities. The default dashboard metrics are:
+
+| Metric | All Cities |
+|---|---:|
+| Median sale price | $410,000 |
+| Number of sales | 35,442 |
+| Median days on market | 11 days |
+| Median distance to campus | 3.4 miles |
+
+These values are independently checked against the supplied SQLite copy of the dataset during development.
+
+The page normally loads the generated JavaScript data asset, which also works in preview tools that open `index.html` directly. The application retains a relative-path JSON request as a fallback. Both generated files contain the same metrics and are written by the same build script.
 
 ## Citation
 
-College-town home sales dataset, version 1.0 (2026). University of Illinois-Deloitte Foundation Center for Business Emerging Technologies. Data collected March 2026.
-
-## Who did what
-
-_For teams: replace this line with each member's name and what they did. If you worked alone, delete this section._
+College-town home sales dataset, version 1.0 (2026). University of Illinois–Deloitte Foundation Center for Business Emerging Technologies. Data collected March 2026.
